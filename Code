@@ -1,0 +1,237 @@
+#include <iostream>
+#include <cstdlib>
+#include<vector>
+#include <ctime>
+using namespace std;
+class Mazo{
+public:
+ string mazo[3];
+ Mazo(){
+ for(int i=0;i<4;i++){
+ mazo[i]=i+3;
+ }
+ }
+};
+class Baraja{
+public:
+ vector<string> baraja;
+ Baraja(){
+ for(int i=0;i<13; i++){
+ baraja.push_back(to_string(i+1));
+ }
+ baraja[0]="A";
+ baraja[10]="J";
+ baraja[11]="Q";
+ baraja[12]="K";
+ }
+};
+class Blackjack{
+public:
+ Baraja* baraja;
+ Mazo* mazo;
+ /*vector<string> baraja;
+ string mazo[3];*/
+ vector<string> jugador,crupier;
+ int sumuser,sumcrupier;
+ Blackjack(Baraja* baraja,Mazo* mazo){
+ for(int i=0;i<20; i++){
+ /* baraja.push_back(to_string(i+1));*/
+ jugador.emplace_back("0");
+ crupier.emplace_back("0");
+ }
+ Blackjack::baraja=baraja;
+ Blackjack::mazo=mazo;
+ sumuser=0;
+ sumcrupier=0;
+ /*baraja[0]="A";
+ baraja[10]="J";
+ baraja[11]="Q";
+ baraja[12]="K";
+ for(int i=0;i<4;i++){
+ mazo[i]=i+3;
+ }*/
+ }
+ void clean(){
+ for(int i=0;i<20; i++){
+ jugador[i]="0";
+ crupier[i]="0";
+ }
+ sumcrupier=0;
+ sumuser=0;
+ }
+ void repartirCartas(){
+ srand(time(nullptr));
+ jugador[0]=(baraja->baraja[rand()%13]),jugador[1]=(mazo->mazo[rand()%4]),jugador[2]=(baraja->baraja[rand()%13]),jugador[3]=(mazo->mazo[rand()%4]);
+ crupier[0]=(baraja->baraja[rand()%13]),crupier[1]=(mazo->mazo[rand()%4]),crupier[2]=(baraja->baraja[rand()%13]),crupier[3]=(mazo->mazo[rand()%4]);
+ cout<<"TUS CARTAS: "<<endl;
+ cout<<"["<<jugador[0]<<jugador[1]<<"]"<<"["<<jugador[2]<<jugador[3]<<"]"<<endl;
+ cout<<"CARTAS CRUPIER: "<<endl;
+ cout<<"["<<crupier[0]<<crupier[1]<<"]"<<"[###]"<<endl;
+ }
+ void pedir(){
+ srand(time(nullptr));
+ for(int i=0;i<20;i=i+2){
+ if(jugador[i]=="0"){
+ jugador[i]=(baraja->baraja[rand()%13]),jugador[i+1]=(mazo->mazo[rand()%4]);
+ break;
+ }
+ }
+ cout<<"\nPEDISTE\n"<<endl;
+ for(int i=0;i<20;i=i+2){
+ if(jugador[i]!="0") {
+ cout << "[" << jugador[i] << jugador[i + 1] << "]";
+ }
+ }
+ cout<<endl;
+ }
+ void juegacrupier(){
+ for(int i=0;i<20;i=i+2){
+ if(crupier[i]=="0"){
+ crupier[i]=(baraja->baraja[rand()%13]),crupier[i+1]=(mazo->mazo[rand()%4]);
+ break;
+ }
+ }
+ cout<<"\n\nEL CRUPIER PIDE\n\n";
+ for(int i=0;i<20;i=i+2){
+ if(crupier[i]!="0") {
+ cout << "[" << crupier[i] << crupier[i + 1] << "]";
+ }
+ }
+ cout<<endl;
+ }
+ void sum(){
+ vector<string> sumju,sumcru;
+ for (int i = 0; i < 20; ++i) {
+ sumju.emplace_back("0");
+ sumcru.emplace_back("0");
+ sumju[i]=jugador[i];
+ sumcru[i]=crupier[i];
+ }
+ for(int i=0;i<20;i++){
+ if(sumju[i]=="A"){
+ sumju[i]="11";
+ }else if(sumju[i]=="J" || sumju[i]=="Q" || sumju[i]=="K"){
+ sumju[i]="10";
+ }
+ if(sumcru[i]=="A"){
+ sumcru[i]="11";
+ }else if(sumcru[i]=="J" || sumcru[i]=="Q" || sumcru[i]=="K"){
+ sumcru[i]="10";
+ }
+ }
+ sumuser=(stoi(sumju[0])+ stoi(sumju[2])+ stoi(sumju[4])+ stoi(sumju[6])+stoi(sumju[8])+stoi(sumju[10])+stoi(sumju[12])+stoi(sumju[14])+stoi(sumju[16])+stoi(sumju[18]));
+ sumcrupier=(stoi(sumcru[0])+ stoi(sumcru[2])+ stoi(sumcru[4])+ stoi(sumcru[6])+stoi(sumcru[8])+stoi(sumcru[10])+stoi(sumcru[12])+stoi(sumcru[14])+stoi(sumcru[16])+stoi(sumcru[18]));
+ if(sumuser>21){
+ for(int i=0;i<20;i++){
+ if(sumju[i]=="11"){
+ sumju[i]="1";
+ }
+ }
+ sumuser=(stoi(sumju[0])+ stoi(sumju[2])+ stoi(sumju[4])+ stoi(sumju[6])+stoi(sumju[8])+stoi(sumju[10])+stoi(sumju[12])+stoi(sumju[14])+stoi(sumju[16])+stoi(sumju[18]));
+ sumcrupier=(stoi(sumcru[0])+ stoi(sumcru[2])+ stoi(sumcru[4])+ stoi(sumcru[6])+stoi(sumcru[8])+stoi(sumcru[10])+stoi(sumcru[12])+stoi(sumcru[14])+stoi(sumcru[16])+stoi(sumcru[18]));
+ }else if(sumcrupier>21){
+ for(int i=0;i<20;i++){
+ if (sumcru[i]=="11"){
+ sumcru[i]="1";
+ }
+ }
+ sumuser=(stoi(sumju[0])+ stoi(sumju[2])+ stoi(sumju[4])+ stoi(sumju[6])+stoi(sumju[8])+stoi(sumju[10])+stoi(sumju[12])+stoi(sumju[14])+stoi(sumju[16])+stoi(sumju[18]));
+ sumcrupier=(stoi(sumcru[0])+ stoi(sumcru[2])+ stoi(sumcru[4])+ stoi(sumcru[6])+stoi(sumcru[8])+stoi(sumcru[10])+stoi(sumcru[12])+stoi(sumcru[14])+stoi(sumcru[16])+stoi(sumcru[18]));
+ }
+ }
+ void result(){
+ mostrarMesa();
+ if(sumuser<22 && sumuser>sumcrupier){
+ cout<<"\nTU GANAS\n"<<endl;
+ }else if(sumuser>21){
+ cout<<"\nTE PASASTE, EL CRUPIER GANA\n"<<endl;
+ }else if(sumcrupier>21){
+ cout<<"\nEL CRUPIER SE PASO, TU GANAS\n"<<endl;
+ }else if(sumcrupier<22 && sumcrupier>sumuser){
+ cout<<"\nEL CRUPIER GANA\n"<<endl;
+ }else{
+ cout<<"\nEMPATE\n"<<endl;
+ }
+ }
+ void mostrarMesa(){
+ cout<<"\nTUS CARTAS"<<endl;
+ for(int i=0;i<20;i=i+2){
+ if(jugador[i]!="0") {
+ cout << "[" << jugador[i] << jugador[i + 1] << "]";
+ }
+ }
+ cout<<"\nCARTAS DEL CRUPIER"<<endl;
+ for(int i=0;i<20;i=i+2){
+ if(crupier[i]!="0") {
+ cout << "[" << crupier[i] << crupier[i + 1] << "]";
+ }
+ }
+ cout<<"\nTU PUNTUACION ES: "<<sumuser;
+ cout<<"\nLA PUNTUACION DEL CRUPIER ES: "<<sumcrupier<<endl;
+ }
+};
+int main() {
+ Mazo c;
+ Baraja d;
+ Blackjack caca(&d,&c);
+ bool flag = true;
+ bool flag2 = true;
+ int opc = 0;
+ while (flag) {
+ caca.clean();
+ cout << "1. jugar blackjack" << endl;
+ cin >> opc;
+ /*system("cls");*/
+ if (opc == 1) {
+ int pedir1;
+ caca.repartirCartas();
+ cout << "1.pedir\n2.plantarse" << endl;
+ cin >> pedir1;
+ if (pedir1 == 1) {
+ while (flag2) {
+ caca.pedir();
+ caca.sum();
+ if (caca.sumuser > 21) {
+ flag2 = false;
+ } else {
+ cout << "1.pedir\n2.plantarse" << endl;
+ cin >> pedir1;
+ if (pedir1 != 1) {
+ flag2 = false;
+ }
+ }
+ }
+ bool flag4 = false;
+ caca.sum();
+ if (caca.sumuser < 22) {
+ flag4 = true;
+ }
+ while (flag4) {
+ if (caca.sumcrupier < 18) {
+ caca.juegacrupier();
+ caca.sum();
+ } else {
+ flag4 = false;
+ }
+ }
+ caca.result();
+ } else {
+ bool flag3 = true;
+ caca.sum();
+ while (flag3) {
+ if (caca.sumcrupier < 18) {
+ caca.juegacrupier();
+ caca.sum();
+ } else {
+ flag3 = false;
+ }
+ }
+ caca.result();
+ }
+ } else {
+ flag = false;
+ }
+
+ }
+ return 0;
+}
